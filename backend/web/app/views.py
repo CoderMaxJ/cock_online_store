@@ -11,6 +11,10 @@ from . serializers import AccountSerializer, PostsSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
+class Index(APIView):
+    def get(self,request):
+        return render(request,'index.html')
+
 class RegisterAccount(APIView):
     permission_classes = (AllowAny,)
     def post(self, request):
