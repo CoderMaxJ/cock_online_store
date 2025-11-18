@@ -1,0 +1,54 @@
+services:
+  backend:
+      container_name: django-backend
+      build:
+        context:  .
+        dockerfile: Dockerfile
+      volumes:
+        - .:/web
+
+      secrets:
+        - db_root_password
+        - db_user_password
+
+      env_file:
+        - ./.env
+      ports:
+        - "${PORT}:8000"
+      depends_on:
+        - mariadb
+
+      environment:
+        - DB_NAME=${DB_NAME}
+        - DB_USER=${DB_USER}
+        - DB_PASSWORD_FILE=/run/secrets/db_user_password
+        - DB_HOST=mariadb
+        - DB_PORT=${DB_PORT}
+
+
+  mariadb:
+    image: mariadb:lts
+    restart: always
+    secrets:
+      - db_root_password
+      - db_user_password
+    environment:
+      MARIADB_ROOT_PASSWORD_FILE: /run/secrets/db_root_password
+      MARIADB_DATABASE: ${DB_NAME}
+      MARIADB_USER: ${DB_USER}
+      MARIADB_PASSWORD_FILE: /run/secrets/db_user_password
+    ports:
+      - "${DB_PORT}:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+
+
+secrets:
+  db_root_password:
+    file: db/authentication/db_root_password.txt
+  db_user_password:
+    file: db/authentication/db_user_password.txt
+
+volumes:
+  static_volume:
+  mariadb_data:
