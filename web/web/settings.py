@@ -25,9 +25,9 @@ SECRET_KEY = config('APP_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['72.61.119.209','barili.shop','www.barili.shop']
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
+    'http://72.61.119.209:3000','https://www.digitalgamefarm.shop','https://digitalgamefarm.shop',
 ]
 
 CORS_ALLOW_HEADERS = [
@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'web.app',
+    'app',
     'corsheaders'
 ]
 
@@ -62,7 +62,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'web.web.urls'
+ROOT_URLCONF = 'web.urls'
 import os
 TEMPLATES = [
     {
@@ -81,9 +81,17 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'web.wsgi.application'
 
+def get_secret(secret_name):
+    secret_path = f"/run/secrets/{secret_name}"
+    try:
+        with open(secret_path, "r") as file:
+            return file.read().strip()
+    except IOError:
+        return None  # Return None if the secret file does not exist
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
+
 
 DATABASES = {
     'default': {
