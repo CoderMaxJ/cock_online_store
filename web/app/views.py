@@ -2,14 +2,15 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from .models import Cocks
 from rest_framework.response import Response
-from django.contrib.auth import get_user_model
 from rest_framework.permissions import  AllowAny,IsAuthenticated
 from rest_framework import  status
-from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from . serializers import AccountSerializer, PostsSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from django.contrib.auth import get_user_model
 
+User = get_user_model()
 
 class Index(APIView):
     def get(self,request):
@@ -20,57 +21,32 @@ class RegisterAccount(APIView):
     def post(self, request):
         serializer = AccountSerializer(data=request.data)
         if serializer.is_valid():
-            user = serializer.save() # if your serializer supports commit=False
-            # Hash the password
+            user = serializer.save()
             user.set_password(serializer.validated_data['password'])
             user.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class LoginView(APIView):
+    permission_classes = [AllowAny]
     def post(self,request):
-        print(request.data)
         username = request.data.get('username')
         password = request.data.get('password')
         if username and password:
             user = authenticate(username=username, password=password)
             if user is not None:
-                print("success")
                 refresh = RefreshToken.for_user(user)
                 access_token = str(refresh.access_token)
                 refresh_token = str(refresh)
-
-                response = Response({'status':'login successful'}, status=status.HTTP_200_OK)
-
-                response.set_cookie(
-                    key="access_token",
-                    value=access_token,  # JWT token
-                    httponly=True,  # prevents JS access (secure)
-                    secure=False,  # True if HTTPS
-                    samesite="Lax"
-                )
-
-                response.set_cookie(
-                    key="refresh_token",
-                    value=refresh_token,
-                    httponly=True,
-                    secure=False,
-                    samesite="Lax"
-                )
-                return response
-
+                return   Response({"refresh_token": refresh_token, "access_token": access_token}, status=status.HTTP_200_OK)
             else:
                 return Response({"message":"Invalid username or password"}, status=status.HTTP_401_UNAUTHORIZED)
         return Response({"error":"username and password are required"},status=status.HTTP_400_BAD_REQUEST)
 
 class UploadView(APIView):
-
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
     def post(self,request):
-        print(request.data)
-        if request.user.is_authenticated:
-            owner = request.user
-        else:
-            # fallback: choose an existing test user (create one in admin or via manage.py)
-            owner = User.objects.filter(is_superuser=True).first()
+        owner = request.user
         bloodline = request.data.get('bloodline')
         price = request.data.get('price')
         images = request.FILES.getlist('images')
@@ -93,12 +69,15 @@ class UploadView(APIView):
                        price=price)
         if cock:
             cock.save()
-        print(image_list)
         return Response({"message":"images uploaded successfully"},status=status.HTTP_200_OK)
 
 class Posts(APIView):
 
     def get(self,request):
-        posts = Cocks.objects.all()
+        q=request.query_params.get('q')
+        if q:
+            posts = Cocks.objects.filter(bloodline__icontains=q)
+        else:
+            posts = Cocks.objects.all()
         serializer = PostsSerializer(posts, many=True)
         return Response(serializer.data)

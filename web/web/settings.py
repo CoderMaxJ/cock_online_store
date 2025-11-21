@@ -23,14 +23,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('APP_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
+CORS_ALLOW_CREDENTIALS = True
 
-ALLOWED_HOSTS = ['72.61.119.209','barili.shop','www.barili.shop','www.digitalgamefarm.shop','digitalgamefarm.shop']
+ALLOWED_HOSTS = ['72.61.119.209','barili.shop','www.barili.shop','www.digitalgamefarm.shop','digitalgamefarm.shop','localhost']
 
 CORS_ALLOWED_ORIGINS = [
     'http://72.61.119.209:3000',
     'https://www.digitalgamefarm.shop',
     'https://digitalgamefarm.shop',
+    'http://localhost:3000'
 ]
 
 
@@ -39,10 +41,7 @@ CORS_ALLOW_HEADERS = [
     "authorization",
     "x-csrftoken",
 ]
-CORS_ALLOW_CREDENTIALS = True
 
-CORS_ALLOW_HEADERS = ["*"]
-CORS_ALLOW_METHODS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
@@ -139,11 +138,6 @@ AUTH_PASSWORD_VALIDATORS = [
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
-SESSION_COOKIE_SAMESITE = 'None'
-SESSION_COOKIE_SECURE = True
-
-CSRF_COOKIE_SAMESITE = 'None'
-CSRF_COOKIE_SECURE = True
 USE_I18N = True
 
 USE_TZ = True
@@ -160,3 +154,14 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=10),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=10),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "USER_ID_FIELD": "id",
+}
