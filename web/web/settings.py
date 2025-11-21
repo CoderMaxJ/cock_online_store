@@ -23,12 +23,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('APP_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['72.61.119.209','barili.shop','www.barili.shop']
+ALLOWED_HOSTS = ['72.61.119.209','barili.shop','www.barili.shop','www.digitalgamefarm.shop','digitalgamefarm.shop']
+
 CORS_ALLOWED_ORIGINS = [
-    'http://72.61.119.209:3000','https://www.digitalgamefarm.shop','https://digitalgamefarm.shop',
+    'http://72.61.119.209:3000',
+    'https://www.digitalgamefarm.shop',
+    'https://digitalgamefarm.shop',
 ]
+
 
 CORS_ALLOW_HEADERS = [
     "content-type",
@@ -37,7 +41,8 @@ CORS_ALLOW_HEADERS = [
 ]
 CORS_ALLOW_CREDENTIALS = True
 
-
+CORS_ALLOW_HEADERS = ["*"]
+CORS_ALLOW_METHODS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
@@ -134,7 +139,11 @@ AUTH_PASSWORD_VALIDATORS = [
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
+SESSION_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SECURE = True
 
+CSRF_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SECURE = True
 USE_I18N = True
 
 USE_TZ = True
