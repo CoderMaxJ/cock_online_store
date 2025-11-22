@@ -72,7 +72,6 @@ class UploadView(APIView):
         return Response({"message":"images uploaded successfully"},status=status.HTTP_200_OK)
 
 class Posts(APIView):
-
     def get(self,request):
         q=request.query_params.get('q')
         if q:
@@ -81,3 +80,10 @@ class Posts(APIView):
             posts = Cocks.objects.all()
         serializer = PostsSerializer(posts, many=True)
         return Response(serializer.data)
+
+class PostsDetails(APIView):
+    def get(self,request,pk):
+        post = Cocks.objects.get(id=pk)
+        serializer = PostsSerializer(post)
+        return Response(serializer.data)
+
