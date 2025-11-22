@@ -85,5 +85,5 @@ class PostsDetails(APIView):
     def get(self,request,pk):
         post = Cocks.objects.get(id=pk)
         serializer = PostsSerializer(post)
-        return Response(serializer.data)
+        return Response(serializer.data,status=status.HTTP_200_OK)
 
