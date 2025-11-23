@@ -1,6 +1,6 @@
 
 from django.urls import path
-from .views import UploadView, RegisterAccount, LoginView,Posts,Index,PostsDetails
+from .views import UploadView, RegisterAccount, LoginView,Posts,Index,PostsDetails,React
 from django.conf import settings
 from django.conf.urls.static import static
 urlpatterns=[
@@ -10,6 +10,7 @@ path('login/',LoginView.as_view(),name='login'),
 path('upload/',UploadView.as_view(),name='index'),
 path('posts/',Posts.as_view(),name='posts'),
 path('cock-details/<int:pk>/',PostsDetails.as_view(),name='cock-details'),
+path('react/',React.as_view(),name='react'),
 
 ]
 if settings.DEBUG:

@@ -10,8 +10,14 @@ class Cocks(models.Model):
     bloodline = models.CharField(max_length=100)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     price = models.DecimalField(decimal_places=2, max_digits=10)
-    location = models.CharField(max_length=120)
-    
+    age = models.CharField(max_length=20,null=True,blank=True)
+    location = models.CharField(max_length=120,null=True,blank=True)
+    category = models.CharField(max_length=5,null=True,blank=True)
+    like = models.IntegerField(default=0,null=True,blank=True)
+    heart = models.IntegerField(default=0,null=True,blank=True)
+    victory = models.IntegerField(default=0,null=True,blank=True)
+    spar_link = models.URLField(null=True,blank=True)
+
     image1 = models.ImageField(upload_to='images/')
     image2 = models.ImageField(upload_to='images/')
     image3 = models.ImageField(upload_to='images/')

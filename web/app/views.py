@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import  AllowAny,IsAuthenticated
 from rest_framework import  status
 from django.contrib.auth import authenticate
-from . serializers import AccountSerializer, PostsSerializer
+from . serializers import AccountSerializer, PostsSerializer,PostsSerializerPartial
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.contrib.auth import get_user_model
@@ -78,7 +78,7 @@ class Posts(APIView):
             posts = Cocks.objects.filter(bloodline__icontains=q)
         else:
             posts = Cocks.objects.all()
-        serializer = PostsSerializer(posts, many=True)
+        serializer = PostsSerializerPartial(posts, many=True)
         return Response(serializer.data)
 
 class PostsDetails(APIView):
@@ -87,3 +87,16 @@ class PostsDetails(APIView):
         serializer = PostsSerializer(post)
         return Response(serializer.data,status=status.HTTP_200_OK)
 
+class React(APIView):
+    def post(self,request):
+        id = request.data.get('id')
+        type = request.data.get('type')
+
+        if id and type:
+            cock=Cocks.objects.get(id=id)
+            if type == 'heart':
+                cock.heart+=1
+            elif type == 'like':
+                cock.like+= 1
+            cock.save()
+        return Response(request.data,status=status.HTTP_200_OK)

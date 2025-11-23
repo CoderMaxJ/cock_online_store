@@ -10,3 +10,8 @@ class PostsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cocks
         fields = '__all__'
+
+class PostsSerializerPartial(serializers.ModelSerializer):
+    class Meta:
+        model = Cocks
+        fields = ['id','image1','price','bloodline','location','like','heart','age']
