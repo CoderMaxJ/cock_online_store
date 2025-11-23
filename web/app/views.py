@@ -50,13 +50,17 @@ class UploadView(APIView):
         bloodline = request.data.get('bloodline')
         price = request.data.get('price')
         images = request.FILES.getlist('images')
+        category = request.data.get('category')
+        age = request.data.get('age')
+        location = request.data.get('location')
+        victory = request.data.get('victory')
+        spar_link = request.data.get('spar_link')
+
         image1 = images[0] if len(images) > 0 else None
         image2 = images[1] if len(images) > 1 else None
         image3 = images[2] if len(images) > 2 else None
         broodcock = images[3] if len(images) > 3 else None
         broodhen = images[4] if len(images) > 4 else None
-
-        image_list = []
 
         cock = Cocks(
                        bloodline = bloodline,
@@ -66,7 +70,13 @@ class UploadView(APIView):
                        broodcock=broodcock,
                        broodhen=broodhen,
                        owner=owner,
-                       price=price)
+                       price=price,
+                       category=category,
+                       age=age,
+                       location=location,
+                       victory=victory,
+                       spar_link=spar_link
+                    )
         if cock:
             cock.save()
         return Response({"message":"images uploaded successfully"},status=status.HTTP_200_OK)
@@ -75,9 +85,9 @@ class Posts(APIView):
     def get(self,request):
         q=request.query_params.get('q')
         if q:
-            posts = Cocks.objects.filter(bloodline__icontains=q)
+            posts = Cocks.objects.filter(bloodline__icontains=q)[:100]
         else:
-            posts = Cocks.objects.all()
+            posts = Cocks.objects.all()[:100]
         serializer = PostsSerializerPartial(posts, many=True)
         return Response(serializer.data)
 
