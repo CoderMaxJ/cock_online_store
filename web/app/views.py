@@ -37,7 +37,7 @@ class LoginView(APIView):
                 refresh = RefreshToken.for_user(user)
                 access_token = str(refresh.access_token)
                 refresh_token = str(refresh)
-                return   Response({"refresh_token": refresh_token, "access_token": access_token}, status=status.HTTP_200_OK)
+                return   Response({"refresh_token": refresh_token, "access_token": access_token,"user":user.username}, status=status.HTTP_200_OK)
             else:
                 return Response({"message":"Invalid username or password"}, status=status.HTTP_401_UNAUTHORIZED)
         return Response({"error":"username and password are required"},status=status.HTTP_400_BAD_REQUEST)
@@ -82,14 +82,20 @@ class UploadView(APIView):
         return Response({"message":"images uploaded successfully"},status=status.HTTP_200_OK)
 
 class Posts(APIView):
+    # authentication_classes = [JWTAuthentication]
+    # permission_classes = [IsAuthenticated]
     def get(self,request):
-        q=request.query_params.get('q')
-        if q:
-            posts = Cocks.objects.filter(bloodline__icontains=q)[:100]
-        else:
-            posts = Cocks.objects.all()[:100]
-        serializer = PostsSerializerPartial(posts, many=True)
-        return Response(serializer.data)
+        try:
+            q=request.query_params.get('q')
+            if q:
+                posts = Cocks.objects.filter(bloodline__icontains=q)[:100]
+            else:
+                posts = Cocks.objects.all()[:100]
+            serializer = PostsSerializerPartial(posts, many=True)
+            return Response(serializer.data)
+        except Cocks.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
 
 class PostsDetails(APIView):
     def get(self,request,pk):
