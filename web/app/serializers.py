@@ -1,10 +1,47 @@
-from rest_framework import serializers
+from rest_framework import serializers, status
 from django.contrib.auth.models import  User
-from . models import Cocks
+from . models import Cocks,Comments,Contacts
+from rest_framework.response import Response
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comments
+        fields = ['id', 'comment', 'date_posted']
+
+class ContactSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Contacts
+        fields = ['id', 'number', 'messenger_link']
+
 class AccountSerializer(serializers.ModelSerializer):
+    number = serializers.CharField(required=False, allow_blank=True)
+    messenger_link = serializers.URLField(required=False, allow_blank=True)
+
     class Meta:
         model = User
-        fields = ['username','password','first_name','last_name','email','is_staff','is_active','is_superuser']
+        fields = [
+            'username','password','first_name','last_name',
+            'number','messenger_link'
+        ]
+        extra_kwargs = {'password': {'write_only': True}}
+
+    def create(self, validated_data):
+        number = validated_data.pop('number', None)
+        messenger_link = validated_data.pop('messenger_link', None)
+
+        # Create the User
+        user = User.objects.create_user(**validated_data)
+        if number or messenger_link:
+            Contacts.objects.create(
+                user=user,
+                number=number,
+                messenger_link=messenger_link
+            )
+
+        return user
+
+
 
 class PostsSerializer(serializers.ModelSerializer):
     class Meta:

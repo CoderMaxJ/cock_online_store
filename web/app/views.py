@@ -19,12 +19,15 @@ class Index(APIView):
 class RegisterAccount(APIView):
     permission_classes = (AllowAny,)
     def post(self, request):
+        print(request.data)
         serializer = AccountSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
             user.set_password(serializer.validated_data['password'])
             user.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class LoginView(APIView):
     permission_classes = [AllowAny]
@@ -85,6 +88,9 @@ class Posts(APIView):
     # authentication_classes = [JWTAuthentication]
     # permission_classes = [IsAuthenticated]
     def get(self,request):
+        user = authenticate(username='guest', password='letmein4321')
+        refresh = RefreshToken.for_user(user)
+        access_token = str(refresh.access_token)
         try:
             q=request.query_params.get('q')
             if q:
@@ -92,7 +98,7 @@ class Posts(APIView):
             else:
                 posts = Cocks.objects.all()[:100]
             serializer = PostsSerializerPartial(posts, many=True)
-            return Response(serializer.data)
+            return Response({"data":serializer.data,"temporary_token":access_token},status=status.HTTP_200_OK)
         except Cocks.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 

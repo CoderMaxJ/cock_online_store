@@ -80,3 +80,15 @@ class Cocks(models.Model):
             self.broodhen = self.compress_image(self.broodhen)
 
         super().save(*args, **kwargs)
+
+
+class Comments(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    comment = models.CharField(max_length=500)
+    date_posted = models.DateTimeField(auto_now_add=True)
+
+class Contacts(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    number = models.CharField(max_length=11)
+    messenger_link = models.URLField(null=True,blank=True)
+
