@@ -40,7 +40,7 @@ class LoginView(APIView):
                 refresh = RefreshToken.for_user(user)
                 access_token = str(refresh.access_token)
                 refresh_token = str(refresh)
-                return   Response({"refresh_token": refresh_token, "access_token": access_token,"user":user.username}, status=status.HTTP_200_OK)
+                return   Response({"refresh_token": refresh_token, "access_token": access_token,"user":user.username,"user_id":user.id}, status=status.HTTP_200_OK)
             else:
                 return Response({"message":"Invalid username or password"}, status=status.HTTP_401_UNAUTHORIZED)
         return Response({"error":"username and password are required"},status=status.HTTP_400_BAD_REQUEST)
@@ -56,7 +56,7 @@ class UploadView(APIView):
         category = request.data.get('category')
         age = request.data.get('age')
         location = request.data.get('location')
-        victory = request.data.get('victory')
+        victory = request.data.get('victory') or 0
         spar_link = request.data.get('spar_link')
 
         image1 = images[0] if len(images) > 0 else None
@@ -123,3 +123,10 @@ class React(APIView):
                 cock.like+= 1
             cock.save()
         return Response(request.data,status=status.HTTP_200_OK)
+
+class Comment(APIView):
+    def post(self,request,id,user_id):
+        post = Comment.objects.get(id=id)
+        comment = request.data.get('comment')
+        if comment:
+            post
