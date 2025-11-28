@@ -93,8 +93,9 @@ class Posts(APIView):
         access_token = str(refresh.access_token)
         try:
             q=request.query_params.get('q')
-            if q:
-                posts = Cocks.objects.filter(bloodline__icontains=q)[:100]
+            t=request.query_params.get('t')
+            if q or t:
+                posts = Cocks.objects.filter(bloodline__icontains=q,category=t)[:100]
             else:
                 posts = Cocks.objects.all()[:100]
             serializer = PostsSerializerPartial(posts, many=True)
