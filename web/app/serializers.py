@@ -51,6 +51,16 @@ class PostsSerializer(serializers.ModelSerializer):
 class PostsSerializerPartial(serializers.ModelSerializer):
     owner_username = serializers.CharField(source='owner.username', read_only=True)
     date_posted = serializers.DateTimeField(format="%b,%d,%Y", read_only=True)
+    totalcomment = serializers.IntegerField(source='comments.count', read_only=True)
+
     class Meta:
         model = Cocks
-        fields = ['id','image1','price','bloodline','location','like','heart','age','victory','spar_link','category','owner_username','date_posted']
+        fields = ['id','image1','price','bloodline','location','like','heart','age','victory','spar_link','category','owner_username','date_posted','totalcomment']
+
+
+
+class CommentsSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source="user.username", read_only=True)
+    class Meta:
+        model = Comments
+        fields = ['id', 'cock', 'user', 'username', 'comment', 'date_posted']
