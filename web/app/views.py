@@ -1,11 +1,11 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
-from .models import Cocks
+from .models import Cocks,Comments
 from rest_framework.response import Response
 from rest_framework.permissions import  AllowAny,IsAuthenticated
 from rest_framework import  status
 from django.contrib.auth import authenticate
-from . serializers import AccountSerializer, PostsSerializer,PostsSerializerPartial
+from . serializers import AccountSerializer, PostsSerializer,PostsSerializerPartial,CommentsSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.contrib.auth import get_user_model
@@ -19,7 +19,6 @@ class Index(APIView):
 class RegisterAccount(APIView):
     permission_classes = (AllowAny,)
     def post(self, request):
-        print(request.data)
         serializer = AccountSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
@@ -124,9 +123,42 @@ class React(APIView):
             cock.save()
         return Response(request.data,status=status.HTTP_200_OK)
 
-class Comment(APIView):
-    def post(self,request,id,user_id):
-        post = Comment.objects.get(id=id)
-        comment = request.data.get('comment')
-        if comment:
-            post
+class CommentCreateView(APIView):
+
+    def post(self, request,id):
+        user = request.user
+        comment_text = request.data.get("comment")
+
+        if not comment_text:
+            return Response({"error": "Comment is required"}, status=400)
+
+        try:
+            cock = Cocks.objects.get(id=id)
+        except Cocks.DoesNotExist:
+            return Response({"error": "Cock not found"}, status=404)
+
+        new_comment = Comments.objects.create(
+            cock = cock,
+            user = user,
+            comment = comment_text
+        )
+
+        return Response({
+            "message": "Comment posted",
+            "comment": {
+                "id": new_comment.id,
+                "user": new_comment.user.username,
+                "comment": new_comment.comment,
+                "date_posted": new_comment.date_posted
+            }
+        }, status=201)
+
+
+class GetComments(APIView):
+    def get(self, request, id):
+        comments = Comments.objects.filter(cock_id=id).order_by('-date_posted')
+        serializer = CommentsSerializer(comments, many=True)
+        return Response({"data":serializer.data}, status=status.HTTP_200_OK)
+
+
+
