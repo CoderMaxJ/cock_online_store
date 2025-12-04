@@ -98,6 +98,7 @@ class Posts(APIView):
             else:
                 posts = Cocks.objects.all()[:100]
             serializer = PostsSerializerPartial(posts, many=True)
+            print(serializer.data)
             return Response({"data":serializer.data,"temporary_token":access_token},status=status.HTTP_200_OK)
         except Cocks.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)

@@ -52,11 +52,26 @@ class PostsSerializerPartial(serializers.ModelSerializer):
     owner_username = serializers.CharField(source='owner.username', read_only=True)
     date_posted = serializers.DateTimeField(format="%b,%d,%Y", read_only=True)
     totalcomment = serializers.IntegerField(source='comments.count', read_only=True)
+    number = serializers.SerializerMethodField()
+    messenger_link = serializers.SerializerMethodField()
 
     class Meta:
         model = Cocks
-        fields = ['id','image1','price','bloodline','location','like','heart','age','victory','spar_link','category','owner_username','date_posted','totalcomment']
+        fields = ['id','image1','price','bloodline','location','like','heart','age','victory','spar_link','category','owner_username','date_posted','totalcomment','number','messenger_link']
 
+    def get_number(self, obj):
+        contact = getattr(obj.owner, 'contacts_set', None)
+        if contact:
+            contact = contact.first()
+            return contact.number if contact else None
+        return None
+
+    def get_messenger_link(self, obj):
+        contact = getattr(obj.owner, 'contacts_set', None)
+        if contact:
+            contact = contact.first()
+            return contact.messenger_link if contact else None
+        return None
 
 
 class CommentsSerializer(serializers.ModelSerializer):
